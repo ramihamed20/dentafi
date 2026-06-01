@@ -61,13 +61,124 @@ const questionSections = [
   ["Saved Questions", "Questions saved for later review.", "bookmark"]
 ];
 
+const defaultStudyPlan = [
+  { id: "plan-1", time: "09:00", task: "Oral Anatomy" },
+  { id: "plan-2", time: "12:30", task: "Endodontics MCQ" },
+  { id: "plan-3", time: "18:00", task: "Mistakes review" }
+];
+
+const motivationalQuotes = [
+  "Discipline today, a confident dentist tomorrow.",
+  "Small study steps build clinical confidence.",
+  "One focused hour can change your whole week.",
+  "Master the basics, then trust your hands.",
+  "Every question solved sharpens your judgment.",
+  "Your future patients need your focus today.",
+  "Review weak topics before they grow teeth.",
+  "Precision starts with patient practice.",
+  "Consistency beats panic before every exam.",
+  "Study calmly, answer clearly, improve daily.",
+  "A steady routine makes hard topics lighter.",
+  "Progress is built one sheet at a time.",
+  "Train your mind before you train your hand.",
+  "Good dentists are made in quiet study hours.",
+  "Today is a good day to understand more.",
+  "Practice until confidence feels familiar.",
+  "Your effort is becoming skill.",
+  "Read carefully, think clinically, answer wisely.",
+  "Weakness is just a topic asking for time.",
+  "You are closer than yesterday.",
+  "Stay curious; dentistry rewards details.",
+  "Finish one task before chasing ten more.",
+  "Confidence grows where repetition lives.",
+  "Study like the clinic is waiting.",
+  "A calm mind remembers more.",
+  "Every mistake is a mapped shortcut.",
+  "Your notes are building your future clinic.",
+  "Do the review your future self needs.",
+  "Questions reveal what reading hides.",
+  "Slow learning is still learning.",
+  "Your streak is proof, not pressure.",
+  "Keep the promise you made to your future.",
+  "Accuracy grows from honest review.",
+  "Learn the why, not only the answer.",
+  "A clear concept saves a long night.",
+  "Make today too useful to waste.",
+  "One topic mastered is one fear gone.",
+  "You do not need perfect, you need steady.",
+  "Study with patience; skill follows.",
+  "Strong foundations make gentle hands.",
+  "The best revision is the one you start.",
+  "Tiny wins make strong students.",
+  "Your focus is your best instrument.",
+  "Repeat the hard part until it softens.",
+  "A confident dentist starts as a patient learner.",
+  "Turn confusion into a checklist.",
+  "Every page is a step toward the chair.",
+  "Practice now, perform calmly later.",
+  "Your habits are your hidden curriculum.",
+  "Do not rush what needs understanding.",
+  "Build skill before you need it.",
+  "Study the mistake, not the shame.",
+  "A clean plan makes a clear mind.",
+  "The topic you avoid needs you most.",
+  "Learn today so tomorrow feels lighter.",
+  "Your effort is not invisible.",
+  "Good preparation feels like peace.",
+  "One review session can rescue a topic.",
+  "Keep going; the pattern will appear.",
+  "You are training attention, not just memory.",
+  "Dentistry rewards steady hands and steady habits.",
+  "Solve, review, repeat, grow.",
+  "A focused student becomes a trusted dentist.",
+  "Do the next useful thing.",
+  "Confidence is evidence collected daily.",
+  "Make your weak topics your next strength.",
+  "The clinic begins with today's notes.",
+  "Protect your focus like a patient appointment.",
+  "Every revision makes recall faster.",
+  "Do not fear hard topics; schedule them.",
+  "Your future badge is built from today.",
+  "Learn slowly enough to keep it.",
+  "Practice questions are mirrors, not judges.",
+  "Your best exam strategy is consistency.",
+  "Small progress still counts.",
+  "A rested mind studies better.",
+  "Understand first, memorize second.",
+  "The next question is another chance.",
+  "Stay sharp, stay kind, stay consistent.",
+  "You can handle one more focused block.",
+  "Knowledge becomes confidence through use.",
+  "Your future clinic deserves today's discipline.",
+  "Study smart, review honestly, rest well.",
+  "The hardest topic will not stay hard.",
+  "A good dentist keeps learning.",
+  "Do not count hours; make hours count.",
+  "Quiet effort becomes visible skill.",
+  "Prepare until calm feels earned.",
+  "You are building clinical instincts.",
+  "One sheet, one quiz, one step.",
+  "Let your plan carry you when motivation dips.",
+  "Details matter, and you can learn them.",
+  "A clear review beats a crowded rush.",
+  "Keep your pace and protect your progress.",
+  "Every correct answer started as practice.",
+  "Strong students ask better questions.",
+  "Your study table is your launchpad.",
+  "Focus now, smile later.",
+  "The future dentist in you is listening.",
+  "You got this, one topic at a time."
+];
+
 const state = {
   theme: localStorage.getItem("dentify.theme") || "dark",
   authenticated: localStorage.getItem("dentify.authed") === "true",
   authView: "login",
   page: getInitialPage(),
   profileOpen: false,
-  mobileOpen: false
+  mobileOpen: false,
+  studyPlan: loadStudyPlan(),
+  wallQuote: pickMotivationalQuote()
 };
 
 const app = document.querySelector("#app");
@@ -91,8 +202,15 @@ window.addEventListener("hashchange", () => {
 document.addEventListener("submit", (event) => {
   event.preventDefault();
   const form = event.target.closest("[data-auth-form]");
-  if (!form) return;
-  login();
+  if (form) {
+    login();
+    return;
+  }
+
+  const planForm = event.target.closest("[data-plan-form]");
+  if (planForm) {
+    addStudyPlanItem(planForm);
+  }
 });
 
 document.addEventListener("click", (event) => {
@@ -124,6 +242,7 @@ document.addEventListener("click", (event) => {
   if (action === "toggle-profile") toggleProfile();
   if (action === "toggle-mobile") toggleMobileDrawer();
   if (action === "close-mobile") closeMobileDrawer();
+  if (action === "delete-plan-row") deleteStudyPlanItem(target.dataset.id);
 });
 
 function getInitialPage() {
@@ -179,6 +298,49 @@ function goTo(page) {
 
 function scrollToTop() {
   requestAnimationFrame(() => window.scrollTo(0, 0));
+}
+
+function loadStudyPlan() {
+  try {
+    const saved = JSON.parse(localStorage.getItem("dentify.studyPlan") || "null");
+    if (Array.isArray(saved) && saved.length) {
+      return saved.filter((item) => item && item.time && item.task);
+    }
+  } catch (error) {
+    localStorage.removeItem("dentify.studyPlan");
+  }
+  return defaultStudyPlan;
+}
+
+function saveStudyPlan() {
+  localStorage.setItem("dentify.studyPlan", JSON.stringify(state.studyPlan));
+}
+
+function pickMotivationalQuote() {
+  const lastQuote = localStorage.getItem("dentify.lastQuote") || "";
+  const pool = motivationalQuotes.filter((quote) => quote !== lastQuote);
+  const quote = pool[Math.floor(Math.random() * pool.length)] || motivationalQuotes[0];
+  localStorage.setItem("dentify.lastQuote", quote);
+  return quote;
+}
+
+function addStudyPlanItem(form) {
+  const time = form.querySelector("[name='plan-time']").value.trim();
+  const task = form.querySelector("[name='plan-task']").value.trim();
+  if (!time || !task) return;
+
+  state.studyPlan = [
+    ...state.studyPlan,
+    { id: `plan-${Date.now()}`, time, task }
+  ].slice(-5);
+  saveStudyPlan();
+  render();
+}
+
+function deleteStudyPlanItem(id) {
+  state.studyPlan = state.studyPlan.filter((item) => item.id !== id);
+  saveStudyPlan();
+  render();
 }
 
 function toggleProfile() {
@@ -409,12 +571,12 @@ function renderPage() {
 
 function renderDashboard() {
   return `
-    <section class="stats-grid">
+    <section class="stats-grid dashboard-stats">
       ${statCard("48", "Materials completed", "file", "purple")}
       ${statCard("350", "Questions solved", "circleHelp", "purple")}
       ${statCard("92%", "Accuracy", "checkCircle", "gold")}
-      ${statCard("24", "Review queue", "clock", "green")}
-      ${statCard("14", "Day streak", "flame", "gold")}
+      ${statCard("42h", "Study hours", "clock", "green")}
+      ${statCard("18", "Saved items", "bookmark", "gold")}
     </section>
     <section class="dashboard-grid">
       <div class="dashboard-left">
@@ -425,34 +587,54 @@ function renderDashboard() {
           <div class="progress-meta"><span>Next review: 12 questions</span><strong>67%</strong></div>
           <button class="btn btn-primary" type="button" data-route="materials">Continue</button>
         </article>
-        <article class="card">
-          <h2>Weak Topics</h2>
-          <div class="topic-list">
-            ${topic("Prosthodontic impressions", 36)}
-            ${topic("Local anesthesia doses", 42)}
-            ${topic("Histology slides", 51)}
-          </div>
-        </article>
-        <article class="card quote-card">
-          <span class="quote-mark">"</span>
-          <p class="card-subtitle">Discipline today, a confident dentist tomorrow.</p>
-          <span class="material-icon">${icon("tooth")}</span>
+        <article class="card study-table-card">
+          <h2>My Study Table</h2>
+          ${renderStudyPlanTable()}
         </article>
       </div>
       <article class="scene-card" aria-label="Dentify mascot scene">
         <img class="scene-light" src="${ASSETS.sceneLight}" alt="Dentify mascot studying in a bright room" loading="lazy" />
         <img class="scene-dark" src="${ASSETS.sceneDark}" alt="Dentify mascot studying at night" loading="lazy" />
-        <div class="card scene-overlay-card">
-          <h2>Recent Activity</h2>
-          <ul class="activity-list">
-            ${activity("Reviewed: Caries", "2h ago", "checkCircle")}
-            ${activity("Quiz: Endodontics", "4h ago", "circleHelp", "purple")}
-            ${activity("Sheet: Local Anesthesia", "Yesterday", "file", "gold")}
-            ${activity("Mock Exam Completed", "Yesterday", "checkCircle")}
-          </ul>
+        <div class="scene-wall-quote">
+          <span>"</span>
+          <p>${escapeHtml(state.wallQuote)}</p>
         </div>
       </article>
     </section>
+  `;
+}
+
+function renderStudyPlanTable() {
+  return `
+    <form class="plan-form" data-plan-form>
+      <input name="plan-time" type="time" aria-label="Study time" required />
+      <input name="plan-task" type="text" aria-label="Study task" placeholder="Add topic" maxlength="28" required />
+      <button class="icon-btn plan-add-btn" type="submit" aria-label="Add study row">${icon("plus", "icon-sm")}</button>
+    </form>
+    <div class="plan-table-wrap">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Topic</th>
+            <th><span class="sr-only">Action</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${state.studyPlan.map((item) => `
+            <tr>
+              <td>${escapeHtml(item.time)}</td>
+              <td>${escapeHtml(item.task)}</td>
+              <td>
+                <button class="plan-delete-btn" type="button" data-action="delete-plan-row" data-id="${escapeHtml(item.id)}" aria-label="Delete ${escapeHtml(item.task)}">
+                  ${icon("x", "icon-sm")}
+                </button>
+              </td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
@@ -760,6 +942,15 @@ function field(label, type, placeholder, iconName, hasEndIcon = false) {
       </div>
     </div>
   `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function brand(compact = false) {
