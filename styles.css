@@ -481,7 +481,7 @@ img {
 }
 
 .mobile-menu-btn {
-  display: none;
+  display: none !important;
 }
 
 .page-heading {
@@ -691,12 +691,12 @@ img {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr) minmax(320px, 1.04fr);
+  grid-template-columns: minmax(280px, 0.78fr) minmax(420px, 1.72fr);
   gap: 18px;
   align-items: stretch;
 }
 
-.dashboard-col {
+.dashboard-left {
   display: grid;
   gap: 18px;
   align-content: start;
@@ -815,19 +815,26 @@ img {
 
 .scene-card {
   position: relative;
-  min-height: 100%;
+  align-self: start;
+  aspect-ratio: 16 / 13;
+  min-height: 0;
   overflow: hidden;
   padding: 0;
-  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel-soft);
+  box-shadow: var(--shadow-soft);
 }
 
 .scene-card img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  min-height: 420px;
   object-fit: cover;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  object-position: center;
+  transform: scale(1.08);
+  transform-origin: center;
 }
 
 .scene-card .scene-light {
@@ -844,6 +851,26 @@ img {
 
 :root[data-theme="dark"] .scene-card .scene-dark {
   display: block;
+}
+
+.scene-overlay-card {
+  position: relative;
+  z-index: 2;
+  width: clamp(300px, 54%, 430px);
+  margin: 18px;
+  padding: 22px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(18px);
+}
+
+.scene-overlay-card .activity-list {
+  gap: 15px;
+}
+
+.scene-overlay-card .activity-item {
+  font-size: 1rem;
 }
 
 .wide-grid {
@@ -1241,15 +1268,7 @@ img {
 
 @media (max-width: 1180px) {
   .dashboard-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.9fr);
-  }
-
-  .scene-card {
-    grid-column: 1 / -1;
-  }
-
-  .scene-card img {
-    max-height: 390px;
+    grid-template-columns: minmax(240px, 0.75fr) minmax(360px, 1.45fr);
   }
 
   .stats-grid {
@@ -1295,7 +1314,9 @@ img {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
+@media (max-width: 767px) {
   .dashboard-shell {
     grid-template-columns: 1fr;
     padding: 12px;
@@ -1315,7 +1336,7 @@ img {
   }
 
   .mobile-menu-btn {
-    display: inline-grid;
+    display: inline-grid !important;
   }
 
   .search-box {
@@ -1385,8 +1406,14 @@ img {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .scene-card img {
-    min-height: 300px;
+  .scene-card {
+    aspect-ratio: 16 / 13;
+  }
+
+  .scene-overlay-card {
+    width: clamp(240px, 54%, 360px);
+    margin: 12px;
+    padding: 18px;
   }
 
   .bar-row {

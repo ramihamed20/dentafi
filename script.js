@@ -1,8 +1,8 @@
 const ASSETS = {
   loginScene: "./assets/login-scene.png",
   mascot: "./assets/mascot-study.png",
-  sceneLight: "./assets/dashboard-scene-light.png",
-  sceneDark: "./assets/dashboard-scene-dark.png",
+  sceneLight: "./assets/dashboard-scene-light-full.png",
+  sceneDark: "./assets/dashboard-scene-dark.jpeg",
   refLogin: "./assets/reference-login.png",
   refLight: "./assets/reference-dashboard-light.png",
   refDark: "./assets/reference-dashboard-dark.png"
@@ -417,46 +417,13 @@ function renderDashboard() {
       ${statCard("14", "Day streak", "flame", "gold")}
     </section>
     <section class="dashboard-grid">
-      <div class="dashboard-col">
+      <div class="dashboard-left">
         <article class="card">
           <h2>Continue Studying</h2>
           <h3 class="continue-title">Oral Histology</h3>
           <div class="progress-line" aria-label="Oral Histology progress"><span style="width:67%"></span></div>
           <div class="progress-meta"><span>Next review: 12 questions</span><strong>67%</strong></div>
           <button class="btn btn-primary" type="button" data-route="materials">Continue</button>
-        </article>
-        <article class="card">
-          <h2>Quick Access</h2>
-          <div class="quick-grid">
-            ${quickTile("Materials", "file", "materials")}
-            ${quickTile("Questions", "circleHelp", "questions")}
-            ${quickTile("Review", "calendar", "review")}
-            ${quickTile("Bookmarks", "bookmark", "bookmarks")}
-          </div>
-        </article>
-        <article class="card quote-card">
-          <span class="quote-mark">"</span>
-          <p class="card-subtitle">Discipline today, a confident dentist tomorrow.</p>
-          <span class="material-icon">${icon("tooth")}</span>
-        </article>
-      </div>
-      <div class="dashboard-col">
-        <article class="card">
-          <h2>Recent Activity</h2>
-          <ul class="activity-list">
-            ${activity("Reviewed: Caries", "2h ago", "checkCircle")}
-            ${activity("Quiz: Endodontics", "4h ago", "circleHelp", "purple")}
-            ${activity("Sheet: Local Anesthesia", "Yesterday", "file", "gold")}
-            ${activity("Mock Exam Completed", "Yesterday", "checkCircle")}
-          </ul>
-        </article>
-        <article class="card">
-          <h2>Today's Review</h2>
-          <div class="topic-list">
-            ${topic("Caries prevention", 82)}
-            ${topic("Periodontal pockets", 65)}
-            ${topic("Root canal steps", 48)}
-          </div>
         </article>
         <article class="card">
           <h2>Weak Topics</h2>
@@ -466,21 +433,24 @@ function renderDashboard() {
             ${topic("Histology slides", 51)}
           </div>
         </article>
-        <article class="card">
-          <h2>Study Streak</h2>
-          <div class="card-top">
-            <div>
-              <p class="stat-number">14 days</p>
-              <p class="card-subtitle">Next badge at 21 days.</p>
-            </div>
-            <span class="stat-icon gold">${icon("flame")}</span>
-          </div>
-          <div class="progress-line" aria-label="Study streak progress" style="margin-top:16px"><span style="width:72%"></span></div>
+        <article class="card quote-card">
+          <span class="quote-mark">"</span>
+          <p class="card-subtitle">Discipline today, a confident dentist tomorrow.</p>
+          <span class="material-icon">${icon("tooth")}</span>
         </article>
       </div>
       <article class="scene-card" aria-label="Dentify mascot scene">
         <img class="scene-light" src="${ASSETS.sceneLight}" alt="Dentify mascot studying in a bright room" loading="lazy" />
         <img class="scene-dark" src="${ASSETS.sceneDark}" alt="Dentify mascot studying at night" loading="lazy" />
+        <div class="card scene-overlay-card">
+          <h2>Recent Activity</h2>
+          <ul class="activity-list">
+            ${activity("Reviewed: Caries", "2h ago", "checkCircle")}
+            ${activity("Quiz: Endodontics", "4h ago", "circleHelp", "purple")}
+            ${activity("Sheet: Local Anesthesia", "Yesterday", "file", "gold")}
+            ${activity("Mock Exam Completed", "Yesterday", "checkCircle")}
+          </ul>
+        </div>
       </article>
     </section>
   `;
